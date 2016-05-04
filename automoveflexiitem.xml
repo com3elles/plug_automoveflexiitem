@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.0" type="plugin" group="system" method="upgrade">
+	<name>plg_system_automoveflexiitem</name>
+	<author>yannick com3elles</author>
+	<creationDate>November 2015</creationDate>
+	<copyright>Copyright (C) 2005 - 2015 Open Source Matters. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>yannick@com3elles.com</authorEmail>
+	<authorUrl>www.com3elles.com</authorUrl>
+	<version>0.1</version>
+	<description>PLG_AUTOMOVEFLEXIITEM_INSTALLATION_DESCRIPTION</description>
+	<files>
+		<filename plugin="automoveflexiitem">automoveflexiitem.php</filename>
+        <filename plugin="automoveflexiitem">automoveflexiitem.xml</filename>
+		<filename>index.html</filename>
+	</files>
+
+	<languages>
+        <language tag="en-GB">en-GB.plg_system_automoveflexiitem.ini</language>
+		<language tag="en-GB">en-GB.plg_system_automoveflexiitem.sys.ini</language>
+		<language tag="fr-FR">fr-FR.plg_system_automoveflexiitem.ini</language>
+		<language tag="fr-FR">fr-FR.plg_system_automoveflexiitem.sys.ini</language>
+	</languages>
+
+	<config>
+		<fields name="params">
+ 
+			<fieldset name="basic">
+                
+                <field name="datemode" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_DATEMODE_LABEL" description="PLG_AUTOMOVEFLEXIITEM_DATEMODE_DESC" class="btn-group btn-group-yesno">
+                <option value="0">PLG_AUTOMOVEFLEXIITEM_DATEMODE_UNPUBLISHEDATE</option>
+                <option value="1">PLG_AUTOMOVEFLEXIITEM_CATEGORYMETHODE_FLEXIDATE</option>
+                </field>
+                
+                <field name="fielddateid" type="sql" default="10" label="PLG_AUTOMOVEFLEXIITEM__DATEFIELD" query="SELECT id AS value, concat( name, ' (', id, ')') AS title FROM #__flexicontent_fields WHERE field_type='date'" description="FLEXI_GOOGLEMAP_ADDRESSFIELD_DESC" value_field="title" showon="datemode:1"/>
+                
+                <field name="catmethode" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_CATEGORYMETHODE_LABEL" description="PLG_AUTOMOVEFLEXIITEM_CATEGORYMETHODE_DESC" class="btn-group btn-group-yesno">
+                <option value="0">PLG_AUTOMOVEFLEXIITEM_CATEGORYMETHODE_INCLUDE</option>
+                <option value="1">PLG_AUTOMOVEFLEXIITEM_CATEGORYMETHODE_EXCLUDE</option>
+                </field>
+                
+				<field name="moved_category" type="category" extension="com_content" label="PLG_AUTOMOVEFLEXIITEM_MOVEDCATEGORY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_MOVEDCATEGORY_DESC"/>
+                
+                <field name="movecat" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_MOVECAT_LABEL" description="PLG_AUTOMOVEFLEXIITEM_MOVECAT_DESC" class="btn-group btn-group-yesno">
+                <option value="0">PLG_AUTOMOVEFLEXIITEM_NOE</option>
+                <option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
+                </field>
+                
+                <field name="target_category" type="category" extension="com_content" label="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_DESC" showon="movecat:1"/>
+				
+                
+                <field name="changestate" type="list"
+					default="nothing"
+					description="PLG_AUTOMOVEFLEXIITEM_STATE_DESC"
+					label="PLG_AUTOMOVEFLEXIITEM_STATE_LABEL"
+				>
+					<option value="nothing">PLG_AUTOMOVEFLEXIITEM_STATE_NOTHING</option>
+                    <option value="0">PLG_AUTOMOVEFLEXIITEM_STATE_UNPUBLISHED</option>
+					<option value="1">PLG_AUTOMOVEFLEXIITEM_STATE_PUBLISHED</option>
+					<option value="-1">PLG_AUTOMOVEFLEXIITEM_STATE_ARCHIVEDED</option>
+					<option value="-2">PLG_AUTOMOVEFLEXIITEM_STATE_TRASHED</option>
+				</field>
+                
+                <field name="cleardate" type="radio"
+					default="1"
+					description="PLG_AUTOMOVEFLEXIITEM_CLEARDATE_DESC"
+					label="PLG_AUTOMOVEFLEXIITEM_CLEARDATE_LABEL" class="btn-group btn-group-yesno"
+				>
+                    <option value="0">PLG_AUTOMOVEFLEXIITEM_NO</option>
+					<option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
+				</field>
+                
+                <field name="actiodelay" type="list"
+					default="now"
+					description="PLG_AUTOMOVEFLEXIITEM_DELAY_DESC"
+					label="PLG_AUTOMOVEFLEXIITEM_DELAY_LABEL"
+				>
+					<option value="now">PLG_AUTOMOVEFLEXIITEM_DELAY_NOW</option>
+                    <option value="1d">PLG_AUTOMOVEFLEXIITEM_DELAY_1D</option>
+					<option value="3d">PLG_AUTOMOVEFLEXIITEM_DELAY_3D</option>
+                    <option value="1s">PLG_AUTOMOVEFLEXIITEM_DELAY_1W</option>
+				</field>
+			</fieldset>
+ 
+		</fields>
+	</config>
+</extension>
