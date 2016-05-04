@@ -25,7 +25,7 @@
 	<config>
 		<fields name="params">
  
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldpath="administrator/components/com_flexicontent/elements/">
                 
                 <field name="datemode" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_DATEMODE_LABEL" description="PLG_AUTOMOVEFLEXIITEM_DATEMODE_DESC" class="btn-group btn-group-yesno">
                 <option value="0">PLG_AUTOMOVEFLEXIITEM_DATEMODE_UNPUBLISHEDATE</option>
@@ -39,10 +39,20 @@
                 <option value="1">PLG_AUTOMOVEFLEXIITEM_CATEGORYMETHODE_EXCLUDE</option>
                 </field>
                 
-				<field name="moved_category" type="category" extension="com_content" label="PLG_AUTOMOVEFLEXIITEM_MOVEDCATEGORY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_MOVEDCATEGORY_DESC"/>
+                <field
+            name="moved_category"
+            type="category"
+            extension="com_content"
+            class="inputbox"
+            default=""
+            label="PLG_AUTOMOVEFLEXIITEM_MOVEDCATEGORY_LABEL"
+            description="PLG_AUTOMOVEFLEXIITEM_MOVEDCATEGORY_DESC"
+            required=""
+            multiple="multiple"
+                       ></field>
                 
                 <field name="movecat" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_MOVECAT_LABEL" description="PLG_AUTOMOVEFLEXIITEM_MOVECAT_DESC" class="btn-group btn-group-yesno">
-                <option value="0">PLG_AUTOMOVEFLEXIITEM_NOE</option>
+                <option value="0">PLG_AUTOMOVEFLEXIITEM_NO</option>
                 <option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
                 </field>
                 

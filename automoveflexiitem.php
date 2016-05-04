@@ -11,6 +11,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
     
     public function onAfterInitialise ()
     {
+        //TODO Ajout du context
         //if (function_exists('dump')) dump($this->_name, 'name');
         // recuperation des options
         $datemode = $this->params->get('datemode','0');
@@ -26,41 +27,27 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $serveurdate = date('Y-m-d H:i:s');
         if (function_exists('dump')) dump($serveurdate, 'date serveur');
 
-
-        // récuperer les articles
-        if 
-        ($methode == 1 || $datemode == 0){// si on exlus des catégorie depuis l'admin et que la date utilisé est la dépublication joomla
-            // Get a database object
-            $dbinclude = JFactory::getDBO();
-            $query = "SELECT * FROM #__content WHERE catid = ' .$moved_cat.' AND publish_down > '.$serveurdate.'";
-            $dbinclude->setQuery($query);
-            $selectarticle = $dbinclude->loadObjectList();
-            if (function_exists('dump')) dump($dbinclude, 'donnée sql include + date joomla');
-        }
-        elseif ($methode == 0 || $datemode == 0){// si on inlus les catégories depuis l'admin et que la date utilisé est la dépublication joomla
-            // Get a database object
-            $dbexclude = JFactory::getDBO();
-            $query = "SELECT * FROM #__content WHERE NOT catid = ' .$moved_cat.' AND publish_down > '.$serveurdate.'";
-            $dbexclude->setQuery($query);
-            $selectarticle = $dbexclude->loadObjectList();
-             if (function_exists('dump')) dump($dbexclude, 'donnée sql exclude + date joomla');
-        }
-        elseif ($methode == 1 || $datemode == 1){// si on exlus des catégorie depuis l'admin et que la date utilisé est un champs flexicontent
-            // Get a database object
-            $dbexclude = JFactory::getDBO();
-            $query = "SELECT * FROM #__content WHERE NOT catid = ' .$moved_cat.' AND publish_down > '.$serveurdate.'";
-            $dbexclude->setQuery($query);
-            $selectarticle = $dbexclude->loadObjectList();
-             if (function_exists('dump')) dump($dbexclude, 'donnée sql exclude + date flexi');
-        }
-        else ($methode == 0 || $datemode == 1){// si on inclus des catégorie depuis l'admin et que la date utilisé est un champs flexicontent
-            // Get a database object
-            $dbexclude = JFactory::getDBO();
-            $query = "SELECT * FROM #__content WHERE NOT catid = ' .$moved_cat.' AND publish_down > '.$serveurdate.'";
-            $dbexclude->setQuery($query);
-            $selectarticle = $dbexclude->loadObjectList();
-             if (function_exists('dump')) dump($dbexclude, 'donnée sql exclude + date flexi');
-        }
+            private function getItemtomove {
+                $categoriesID = implode(',', $moved_cat);
+                if ($methode == 1){
+                $whereCateg = 'catid IN ('.$categoriesID.')';
+                    }else{
+                $whereCateg = 'catid NOT ('.$categoriesID.')';
+                }
+                if ($datemode ==0){
+                   $datsource = 'publish_down';
+                }else{
+                    $datsource = 'publish_down';//TODO requete pour le champ flexicontent
+                }
+                
+                $db = JFactory::getDBO();
+                $query = "SELECT * FROM #__content WHERE ' .$whereCateg.' AND '.$datsource.' < '.$serveurdate.'"; //TODO ajout de la limite
+                $db->setQuery($query);
+                $selectarticle = $db->loadObjectList();
+                return $selectarticle;
+                if (function_exists('dump')) dump($query, 'requette');
+                if (function_exists('dump')) dump($selectarticle, 'export de donnée');
+            }
         
         // on deplace et on traite
         foreach ($selectarticle as $article){
