@@ -58,7 +58,17 @@
                 
                 <field name="target_category" type="category" extension="com_content" label="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_DESC" showon="movecat:1"/>
 				
-                
+                <field name="limit" type="list"
+					default="20"
+					description="PLG_AUTOMOVEFLEXIITEM_LIMIT_DESC"
+					label="PLG_AUTOMOVEFLEXIITEM_LIMIT_LABEL"
+				>
+					<option value="10">10</option>
+                    <option value="20">20</option>
+					<option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+				</field>
                 <field name="changestate" type="list"
 					default="nothing"
 					description="PLG_AUTOMOVEFLEXIITEM_STATE_DESC"

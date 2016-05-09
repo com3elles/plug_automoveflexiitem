@@ -2,16 +2,15 @@
 defined('_JEXEC') or die;
 
 class PlgSystemAutomoveflexiitem extends JPlugin
-{
+
+    protected $autoloadLanguage = true;
     public function __construct( &$subject, $config )
     {
         parent::__construct( $subject, $config );
  
     }
-    
     public function onAfterInitialise ()
     {
-        //TODO Ajout du context
         //if (function_exists('dump')) dump($this->_name, 'name');
         // recuperation des options
         $datemode = $this->params->get('datemode','0');
@@ -23,41 +22,46 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $state = $this->params->get('changestate', 'nothing');
         $delay = $this->params->get('actiodelay', 'now');
         $cleardate = $this->params->get('cleardate', '1');
+        $limit = 'LIMIT '.$this->params->get('limit', '20');
         
+        if ($context != 'com_flexicontent.item'){//context
+            return true;
+        }
         $serveurdate = date('Y-m-d H:i:s');
-        if (function_exists('dump')) dump($serveurdate, 'date serveur');
+       if (function_exists('dump')) dump($serveurdate, 'date serveur');
+    }
+    private function getItem () {
 
-            private function getItemtomove {
-                $categoriesID = implode(',', $moved_cat);
-                if ($methode == 1){
+        $categoriesID = implode(',', $moved_cat);
+        if (function_exists('dump')) dump($categoriesID, 'catid');
+        if ($methode == 1){
                 $whereCateg = 'catid IN ('.$categoriesID.')';
-                    }else{
+            }else{
                 $whereCateg = 'catid NOT ('.$categoriesID.')';
-                }
-                if ($datemode ==0){
-                   $datsource = 'publish_down';
-                }else{
-                    $datsource = 'publish_down';//TODO requete pour le champ flexicontent
-                }
-                
-                $db = JFactory::getDBO();
-                $query = "SELECT * FROM #__content WHERE ' .$whereCateg.' AND '.$datsource.' < '.$serveurdate.'"; //TODO ajout de la limite
-                $db->setQuery($query);
-                $selectarticle = $db->loadObjectList();
-                return $selectarticle;
-                if (function_exists('dump')) dump($query, 'requette');
-                if (function_exists('dump')) dump($selectarticle, 'export de donnée');
             }
-        
-        // on deplace et on traite
+        if (function_exists('dump')) dump($whereCateg, 'catid');
+        if ($datemode ==0){
+                $datsource = 'publish_down';
+            }else{
+                $datsource = 'publish_down';//TODO requete pour le champ flexicontent
+            }
+            $db = JFactory::getDBO();
+            $query = "SELECT * FROM #__content WHERE ' .$whereCateg.' AND '.$datsource.' < '.$serveurdate.' '.$limit.'";
+            $db->setQuery($query);
+            if (function_exists('dump')) dump($query, 'requette');
+            $selectarticle = $db->loadObjectList();
+            return $selectarticle;
+            if (function_exists('dump')) dump($selectarticle, 'export de donnée');
+           }
+    private function moveItem () {
+        // on deplace et on traite (déplacement catégorie, changement statu, reinitialisation date)
+        //construction de la requette
         foreach ($selectarticle as $article){
             if ($cleardate == 1){
-                //on change l'article de place + on clean ca date
+                //UPDATE
             }else{
-                //on change l'article de place sans changer la date
+                //UPDATE
             }
-            
         }
-
     }
 }
