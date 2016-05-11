@@ -90,16 +90,8 @@
 					<option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
 				</field>
                 
-                <field name="actiodelay" type="list"
-					default="now"
-					description="PLG_AUTOMOVEFLEXIITEM_DELAY_DESC"
-					label="PLG_AUTOMOVEFLEXIITEM_DELAY_LABEL"
-				>
-					<option value="now">PLG_AUTOMOVEFLEXIITEM_DELAY_NOW</option>
-                    <option value="1d">PLG_AUTOMOVEFLEXIITEM_DELAY_1D</option>
-					<option value="3d">PLG_AUTOMOVEFLEXIITEM_DELAY_3D</option>
-                    <option value="1s">PLG_AUTOMOVEFLEXIITEM_DELAY_1W</option>
-				</field>
+                
+                <field name="actiondelay" type="text" default="0" label="PLG_AUTOMOVEFLEXIITEM_DELAY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_DELAY_DESC" />
 			</fieldset>
  
 		</fields>

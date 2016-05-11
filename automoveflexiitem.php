@@ -19,7 +19,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $moved_cat = $this->params->get('moved_category', '');//catégorie a traiter
         $target_cat = $this->params->get('target_category', '');
         $state = $this->params->get('changestate', 'nothing');
-        $delay = $this->params->get('actiodelay', 'now');
+        $delay = $this->params->get('actiondelay', 'now');
         $cleardate = $this->params->get('cleardate', '1');
         $limit = 'LIMIT '.$this->params->get('limit', '20').'';
         $fielddateid= $this->params->get('fielddateid','');
@@ -27,8 +27,18 @@ class PlgSystemAutomoveflexiitem extends JPlugin
        // if ($context != 'com_flexicontent'){//context indisponible avec onafterinitialise
          //   return true;
         //}
-        $serveurdate = date('Y-m-d H:i:s');
-       if (function_exists('dump')) dump($serveurdate, 'date serveur');
+        
+        // private function getDateaction () {
+        $serveurdateinit = date('Y-m-d H:i:s');
+        if ($delay !=0){
+        $serveurdate = 'ADDDATE('.$serveurdateinit.', INTERVAL '.$delay.')';
+        }else{
+        $serveurdate = $serveurdateinit;
+            }
+        if (function_exists('dump')) dump($serveurdateinit, 'date serveur');
+       if (function_exists('dump')) dump($serveurdate, 'date serveur + delay');
+        return $serveurdate;
+    }
    // }
    // private function getItem () {
 
