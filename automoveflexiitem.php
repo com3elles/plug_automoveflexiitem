@@ -11,7 +11,6 @@ class PlgSystemAutomoveflexiitem extends JPlugin
     }
     public function onAfterInitialise ()
     {
-        //if (function_exists('dump')) dump($this->_name, 'name');
         // recuperation des options
         $datemode = $this->params->get('datemode','0');
         $fielddateid = $this->params->get('fielddateid','');
