@@ -25,44 +25,45 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $limit = 'LIMIT '.$this->params->get('limit', '20').'';
         $fielddateid= $this->params->get('fielddateid','');
         
-       // if ($context != 'com_flexicontent'){//context
+       // if ($context != 'com_flexicontent'){//context indisponible avec onafterinitialise
          //   return true;
         //}
         $serveurdate = date('Y-m-d H:i:s');
        if (function_exists('dump')) dump($serveurdate, 'date serveur');
-    }
-    private function getItem () {
+   // }
+   // private function getItem () {
 
         $categoriesID = implode(',', $moved_cat);
         if (function_exists('dump')) dump($categoriesID, 'catid');
-        if ($methode == 1){
+        if ($methode == 0){
                 $whereCateg = 'catid IN ('.$categoriesID.')';
             }else{
-                $whereCateg = 'catid NOT ('.$categoriesID.')';
+                $whereCateg = 'catid NOT IN ('.$categoriesID.')';
             }
         if (function_exists('dump')) dump($whereCateg, 'catid');
         if ($datemode ==0){
-                $datsource = 'WHERE a.publish_down';
+                $datsource = 'a.id, a.title, a.publish_down, a.catid FROM #__content AS a WHERE a.publish_down';
             }else{
-                $datsource = 'AS a LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id WHERE b.field_id = '.$fielddateid.'';
+                $datsource = 'a.id, a.title, a.publish_down, b.field_id, b.value , a.catid FROM #__content AS a LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
             }
             $db = JFactory::getDBO();
-            $query = "SELECT a.id, a.title, a.publish_down, b.field_id, b.value , a.catid FROM #__content '.$datsource.' < '.$serveurdate.' AND '.$whereCateg.' '.$limit.'";
+            $query = "SELECT  $datsource > '$serveurdate' AND $whereCateg $limit";
             $db->setQuery($query);
             if (function_exists('dump')) dump($query, 'requette');
             $selectarticle = $db->loadObjectList();
-            return $selectarticle;
             if (function_exists('dump')) dump($selectarticle, 'export de donnée');
-           }
-    private function moveItem () {
+            return $selectarticle;
+            
+           //}
+    //private function moveItem () {
         // on deplace et on traite (déplacement catégorie, changement statu, reinitialisation date)
         //construction de la requette
-        foreach ($selectarticle as $article){
-            if ($cleardate == 1){
+      //  foreach ($selectarticle as $article){
+        //    if ($cleardate == 1){
                 //UPDATE
-            }else{
+          //  }else{
                 //UPDATE
-            }
-        }
+            //}
+        //}
     }
 }
