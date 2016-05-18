@@ -30,9 +30,10 @@ class PlgSystemAutomoveflexiitem extends JPlugin
          
         $srvdate = $this->_getDateAction($delay);
         
-        $listContents = $this->_getItemsToMove ($serveurdate, $moved_cat, $methode, $datemode);
+        $listContents = $this->_getItemsToMove ($srvdate, $moved_cat, $methode, $datemode, $fielddateid);
         
-        $this->_moveItems();
+        if($listContents)
+            $this->_moveItems();
    }
         
     private function _getDateAction ($delay) {
@@ -47,7 +48,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         return $serveurdate;
     }
    
-   private function _getItemsToMove ($serveurdate, $moved_cat, $methode, $datemode) {
+   private function _getItemsToMove ($serveurdate, $moved_cat, $methode, $datemode, $fielddateid) {
 
         $categoriesID = implode(',', $moved_cat);
         if (function_exists('dump')) dump($categoriesID, 'catid');
@@ -60,20 +61,24 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         if ($datemode ==0){
                 $datsource = 'a.id, a.title, a.publish_down, a.catid FROM #__content AS a WHERE a.publish_down';
             }else{
-                $datsource = 'a.id, a.title, a.publish_down, b.field_id, b.value , a.catid FROM #__content AS a LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
+                $datsource = 'a.id, a.title, a.publish_down, b.field_id, b.value , a.catid FROM #__content AS a ' .
+                            'LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id ' .
+                            'WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
             }
             $db = JFactory::getDBO();
             $query = "SELECT  $datsource > '$serveurdate' AND $whereCateg $limit";
             $db->setQuery($query);
-            if (function_exists('dump')) dump($query, 'requette');
+            if (function_exists('dump')) dump($query, 'requete');
+            //if (function_exists('dump')) dump($query->__toString(), 'requete toString');
             $selectarticle = $db->loadObjectList();
-            if (function_exists('dump')) dump($selectarticle, 'export de donnée');
+            if (function_exists('dump')) dump($selectarticle, 'export de données');
             return $selectarticle;
     }
     
     private function _moveItems () {
         // on deplace et on traite (déplacement catégorie, changement statu, reinitialisation date)
         //construction de la requette
+        if (function_exists('dump')) dump("", 'Des données sont à archiver');
       //  foreach ($selectarticle as $article){
         //    if ($cleardate == 1){
                 //UPDATE
