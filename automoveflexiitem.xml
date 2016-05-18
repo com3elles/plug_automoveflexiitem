@@ -57,6 +57,13 @@
                 </field>
                 
                 <field name="target_category" type="category" extension="com_content" label="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_DESC" showon="movecat:1"/>
+                
+                <field name="movesubcat" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_MOVESUBCAT_LABEL" description="PLG_AUTOMOVEFLEXIITEM_MOVESUBCAT_DESC" class="btn-group btn-group-yesno">
+                <option value="0">PLG_AUTOMOVEFLEXIITEM_NO</option>
+                <option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
+                </field>
+                
+                <field name="target_subcategory" type="category" extension="com_content" label="PLG_AUTOMOVEFLEXIITEM_TARGETSUBCATEGORY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_TARGETSUBCATEGORY_DESC" showon="movesubcat:1"/>
 				
                 <field name="limit" type="list"
 					default="20"
@@ -91,7 +98,7 @@
 				</field>
                 
                 
-                <field name="actiondelay" type="text" default="0" label="PLG_AUTOMOVEFLEXIITEM_DELAY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_DELAY_DESC" />
+                <field name="actiondelay" type="text" default="" label="PLG_AUTOMOVEFLEXIITEM_DELAY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_DELAY_DESC" />
 			</fieldset>
  
 		</fields>

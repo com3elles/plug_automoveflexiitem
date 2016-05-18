@@ -11,35 +11,23 @@ class PlgSystemAutomoveflexiitem extends JPlugin
     }
     public function onAfterInitialise ()
     {
-        // recuperation des options
-        $datemode = $this->params->get('datemode','0');
-        $fielddateid = $this->params->get('fielddateid','');
-        $methode = $this->params->get('catmethode', '1');
-        $movecat = $this->params->get('movecat','0');//si on déplace ou non
-        $moved_cat = $this->params->get('moved_category', '');//catégorie a traiter
-        $target_cat = $this->params->get('target_category', '');
-        $state = $this->params->get('changestate', 'nothing');
-        $delay = $this->params->get('actiondelay', 'now');
-        $cleardate = $this->params->get('cleardate', '1');
-        $limit = 'LIMIT '.$this->params->get('limit', '20').'';
-        $fielddateid= $this->params->get('fielddateid','');
+        $datemode = $this->params->get('datemode','');//0 joomla unplishing date or 1 for flexicontent date
+        $fielddateid = $this->params->get('fielddateid','');//id of flexicontent date field
         
-       // if ($context != 'com_flexicontent'){//context indisponible avec onafterinitialise
-         //   return true;
-         //}
-         
-        $srvdate = $this->_getDateAction($delay);
-        
-        $listContents = $this->_getItemsToMove ($srvdate, $moved_cat, $methode, $datemode, $fielddateid);
-        
+        $srvdate = $this->_getDateAction();
+
+        $listContents = $this->_getItemsToMove ($srvdate, $datemode, $fielddateid);
+        if (function_exists('dump')) dump($listContents, 'Des données sont à archivées');
         if($listContents)
-            $this->_moveItems();
+            $this->_moveItems($listContents, $datemode, $fielddateid);
+        
    }
         
-    private function _getDateAction ($delay) {
+    private function _getDateAction () {
+        $delay = $this->params->get('actiondelay', '');//add delay to sql for get item
         $serveurdateinit = date('Y-m-d H:i:s');
         if ($delay !=0){
-        $serveurdate = 'ADDDATE('.$serveurdateinit.', INTERVAL '.$delay.')';
+        $serveurdate = 'ADDDATE("'.$serveurdateinit.'", INTERVAL '.$delay.')';
         }else{
         $serveurdate = $serveurdateinit;
             }
@@ -48,7 +36,10 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         return $serveurdate;
     }
    
-   private function _getItemsToMove ($serveurdate, $moved_cat, $methode, $datemode, $fielddateid) {
+   private function _getItemsToMove ($serveurdate, $datemode, $fielddateid) {
+       $methode = $this->params->get('catmethode', '1');// 1 include or 0 exclude categories
+       $moved_cat = $this->params->get('moved_category', '');//categories to get item
+       $limit = 'LIMIT '.$this->params->get('limit', '20').'';//number of item to get
 
         $categoriesID = implode(',', $moved_cat);
         if (function_exists('dump')) dump($categoriesID, 'catid');
@@ -66,7 +57,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
                             'WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
             }
             $db = JFactory::getDBO();
-            $query = "SELECT  $datsource > '$serveurdate' AND $whereCateg $limit";
+            $query = "SELECT  $datsource > $serveurdate AND $whereCateg $limit";
             $db->setQuery($query);
             if (function_exists('dump')) dump($query, 'requete');
             //if (function_exists('dump')) dump($query->__toString(), 'requete toString');
@@ -75,16 +66,55 @@ class PlgSystemAutomoveflexiitem extends JPlugin
             return $selectarticle;
     }
     
-    private function _moveItems () {
-        // on deplace et on traite (déplacement catégorie, changement statu, reinitialisation date)
-        //construction de la requette
-        if (function_exists('dump')) dump("", 'Des données sont à archiver');
-      //  foreach ($selectarticle as $article){
-        //    if ($cleardate == 1){
-                //UPDATE
-          //  }else{
-                //UPDATE
-            //}
-        //}
+    private function _moveItems ($listContents, $datemode) {
+        $movecat = $this->params->get('movecat','');//0 not move article or 1 for move
+        $target_cat = $this->params->get('target_category', '');//id of target move categorie
+        $movesubcat = $this->params->get('movesubcat','');//0 not move article in subcator 1 for move
+        $target_subcat = $this->params->get('target_subcategory', '');//id of target move subcategorie
+        $state = $this->params->get('changestate', '');//changing state of article
+        $cleardate = $this->params->get('cleardate', '');//clear date nothing, 0 unpblished, 1 published, -1 archived, -2 trashed
+        
+        if ($cleardate == 1 && $datemode == 0){ //clear joomla unpublished date
+                $changeDate="publish_down = 0000-00-00 00:00:00";
+            }elseif ($cleardate == 1 && $datemode == 1){ //clear flexicontent dat field
+                $changeDate="";//TODO 
+            }else{
+                $changeDate="";
+         }
+        
+        switch ($state){//changing state
+            case '0': 
+                $changeState="state = 0";
+            break;
+                case '1': 
+                $changeState="state = 1";
+            break;
+            case '-1': 
+                $changeState="state = -1";
+            break;
+            case '-2': 
+                $changeState="state = -2";
+            break;
+            case 'nothing':
+                $changeState="";
+            break;
+        }
+        if ($movecat == 1 && $movesubcat == 0){//move article
+            $changeCat="catid = $target_cat";
+        }elseif ($movecat == 1 && $movesubcat == 1){
+            $changeCat="catid = $target_cat".
+                        "LEFT JOIN ";//FLEXIContent subcat
+        }else {
+            $changeCat="";
+        }
+        
+      foreach ($listContents as $article){
+          $db = JFactory::getDBO();
+          $query = "UPDATE #__content SET $changeDate $changeState $changeCat WHERE id ='$article->id'";
+         // $db->setQuery($query);
+          if (function_exists('dump')) dump($query, 'requette update');
+          //$result = $db->execute();  
+          //if (function_exists('dump')) dump($result, 'resultat requette update');
+        }
     }
 }
