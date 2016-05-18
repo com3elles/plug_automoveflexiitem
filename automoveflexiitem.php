@@ -29,6 +29,10 @@ class PlgSystemAutomoveflexiitem extends JPlugin
          //}
          
         $srvdate = $this->_getDateAction($delay);
+        
+        $listContents = $this->_getItemsToMove ($serveurdate, $moved_cat, $methode, $datemode);
+        
+        $this->_moveItems();
    }
         
     private function _getDateAction ($delay) {
@@ -41,10 +45,9 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         if (function_exists('dump')) dump($serveurdateinit, 'date serveur');
        if (function_exists('dump')) dump($serveurdate, 'date serveur + delay');
         return $serveurdate;
-        }
     }
    
-   private function getItem () {
+   private function _getItemsToMove ($serveurdate, $moved_cat, $methode, $datemode) {
 
         $categoriesID = implode(',', $moved_cat);
         if (function_exists('dump')) dump($categoriesID, 'catid');
@@ -66,10 +69,9 @@ class PlgSystemAutomoveflexiitem extends JPlugin
             $selectarticle = $db->loadObjectList();
             if (function_exists('dump')) dump($selectarticle, 'export de donnée');
             return $selectarticle;
-            
     }
     
-    private function moveItem () {
+    private function _moveItems () {
         // on deplace et on traite (déplacement catégorie, changement statu, reinitialisation date)
         //construction de la requette
       //  foreach ($selectarticle as $article){
