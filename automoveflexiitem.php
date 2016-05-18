@@ -26,9 +26,12 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         
        // if ($context != 'com_flexicontent'){//context indisponible avec onafterinitialise
          //   return true;
-        //}
+         //}
+         
+        $srvdate = $this->_getDateAction($delay);
+   }
         
-        // private function getDateaction () {
+    private function _getDateAction ($delay) {
         $serveurdateinit = date('Y-m-d H:i:s');
         if ($delay !=0){
         $serveurdate = 'ADDDATE('.$serveurdateinit.', INTERVAL '.$delay.')';
@@ -38,9 +41,10 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         if (function_exists('dump')) dump($serveurdateinit, 'date serveur');
        if (function_exists('dump')) dump($serveurdate, 'date serveur + delay');
         return $serveurdate;
+        }
     }
-   // }
-   // private function getItem () {
+   
+   private function getItem () {
 
         $categoriesID = implode(',', $moved_cat);
         if (function_exists('dump')) dump($categoriesID, 'catid');
@@ -63,8 +67,9 @@ class PlgSystemAutomoveflexiitem extends JPlugin
             if (function_exists('dump')) dump($selectarticle, 'export de donnée');
             return $selectarticle;
             
-           //}
-    //private function moveItem () {
+    }
+    
+    private function moveItem () {
         // on deplace et on traite (déplacement catégorie, changement statu, reinitialisation date)
         //construction de la requette
       //  foreach ($selectarticle as $article){
