@@ -66,7 +66,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
             return $selectarticle;
     }
     
-    private function _moveItems ($listContents, $datemode) {
+    private function _moveItems ($listContents, $datemode, $fielddateid) {
         $movecat = $this->params->get('movecat','');//0 not move article or 1 for move
         $target_cat = $this->params->get('target_category', '');//id of target move categorie
         $movesubcat = $this->params->get('movesubcat','');//0 not move article in subcator 1 for move
@@ -75,34 +75,34 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $cleardate = $this->params->get('cleardate', '');//clear date nothing, 0 unpblished, 1 published, -1 archived, -2 trashed
         
         if ($cleardate == 1 && $datemode == 0){ //clear joomla unpublished date
-                $changeDate="publish_down = 0000-00-00 00:00:00";
-            }elseif ($cleardate == 1 && $datemode == 1){ //clear flexicontent dat field
-                $changeDate="";//TODO 
+                $changeDate="a.publish_down = '0000-00-00 00:00:00'";
+            }elseif ($cleardate == 1 && $datemode == 1){ //clear flexicontent date field
+                $changeDate="value ='0000-00-00 00:00:00'";//TODO 
             }else{
                 $changeDate="";
          }
         
         switch ($state){//changing state
             case '0': 
-                $changeState="state = 0";
+                $changeState="a.state =0";
             break;
                 case '1': 
-                $changeState="state = 1";
+                $changeState="a.state =1";
             break;
             case '-1': 
-                $changeState="state = -1";
+                $changeState="a.state =-1";
             break;
             case '-2': 
-                $changeState="state = -2";
+                $changeState="a.state =-2";
             break;
             case 'nothing':
-                $changeState="";
+                $changeState=" ";
             break;
         }
         if ($movecat == 1 && $movesubcat == 0){//move article
-            $changeCat="catid = $target_cat";
+            $changeCat="a.catid =$target_cat";
         }elseif ($movecat == 1 && $movesubcat == 1){
-            $changeCat="catid = $target_cat".
+            $changeCat="a.catid =$target_cat ".
                         "LEFT JOIN ";//FLEXIContent subcat
         }else {
             $changeCat="";
@@ -110,11 +110,15 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         
       foreach ($listContents as $article){
           $db = JFactory::getDBO();
-          $query = "UPDATE #__content SET $changeDate $changeState $changeCat WHERE id ='$article->id'";
-         // $db->setQuery($query);
+          $query = "UPDATE #__content SET $changeDate $changeState $changeCat WHERE id =$article->id";
+          // $db->setQuery($query);
+          if ($cleardate == 1 && $datemode == 1){//clear flexicontent date field
+                $querydateflexi = "UPDATE #__flexicontent_fields_item_relations SET $changeDate  WHERE field_id= $fielddateid AND id =$article->id";
+              if (function_exists('dump')) dump($querydateflexi, 'requette update date flexi');
+              // $db->setQuery($querydateflexi);
+          }
           if (function_exists('dump')) dump($query, 'requette update');
           //$result = $db->execute();  
-          //if (function_exists('dump')) dump($result, 'resultat requette update');
         }
     }
 }
