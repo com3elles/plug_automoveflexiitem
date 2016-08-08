@@ -81,7 +81,6 @@ class PlgSystemAutomoveflexiitem extends JPlugin
 
 		$db = JFactory::getDBO();
 		// construction de la requete SQL
-//FIXME $datsource > $serveurdate ??? c dangeureux comme codage, et d'ailleurs ca plantait dans un des cas		$query = "SELECT  $datsource > $serveurdate AND $whereCateg $limit";
 		$sWheres = implode(" AND ", $tWheres);
 		$query = "SELECT $datsource WHERE $sWheres $limit";
 		$db->setQuery($query);
