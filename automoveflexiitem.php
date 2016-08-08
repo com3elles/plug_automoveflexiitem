@@ -22,7 +22,9 @@ class PlgSystemAutomoveflexiitem extends JPlugin
             $this->_moveItems($listContents, $datemode, $fielddateid);
         
    }
-        
+    /**
+	* Get date and delay
+	*/
     private function _getDateAction () {
         $delay = $this->params->get('actiondelay', ''); // add delay to sql for get item
         $serveurdateinit = date('Y-m-d H:i:s');
@@ -31,13 +33,13 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         }else{
         $serveurdate = $serveurdateinit;
             }
-        if (function_exists('dump')) dump($serveurdateinit, 'date serveur');
+       // if (function_exists('dump')) dump($serveurdateinit, 'date serveur');
        if (function_exists('dump')) dump($serveurdate, 'date serveur + delay');
         return $serveurdate;
     }
    
 	/**
-	* Récupération des items à déplacer
+	* Get item to move
 	*/
 	private function _getItemsToMove ($serveurdate, $datemode, $fielddateid) {
 		$methode = $this->params->get('catmethode', '1');       // 1 include or 0 exclude categories
@@ -51,15 +53,17 @@ class PlgSystemAutomoveflexiitem extends JPlugin
 		if ($datemode != 0) {
 			$datsource = 'a.id, a.title, a.publish_down, b.field_id, b.value, a.catid FROM #__content AS a ' .
 						'LEFT JOIN #__flexicontent_fields_item_relations AS b ON b.item_id = a.id';
-//TODO move down (l.75-76)			'WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
 			}
 
 		// construction des clauses WHERE
 		$tWheres = array();
 
 		// clause sur la date de publication
-		if ($datemode == 0)
-			$tWheres[] = "a.publish_down > '$serveurdate'";
+		if ($datemode == 0){
+            $tWheres[] = "a.publish_down < '$serveurdate'";
+        } else {
+            $tWheres[] = "b.value < '$serveurdate'";
+        }
 		 
 		// clause sur les categories
 		$categoriesID = implode(',', $moved_cat);
@@ -69,10 +73,10 @@ class PlgSystemAutomoveflexiitem extends JPlugin
 		} else {
 			$tWheres[] = "a.catid NOT IN (".$categoriesID.")";
 		}
-		//if (function_exists("dump")) dump($whereCateg, "catid");
+		if (function_exists("dump")) dump($datemode, "datemode");
 
-		// clause sur l'id du champ date (??? c ca ?)
-		if ($fielddateid) 
+		// clause sur l'utilisation d'un champ date flexi
+		if ($datemode == 1)
 			$tWheres[] = "b.field_id = ".$fielddateid;
 
 		$db = JFactory::getDBO();
@@ -84,10 +88,13 @@ class PlgSystemAutomoveflexiitem extends JPlugin
 		if (function_exists("dump")) dump($query, 'requete');
 		//if (function_exists("dump")) dump($query->__toString(), 'requete toString');
 		$selectarticle = $db->loadObjectList();
-		if (function_exists("dump")) dump($selectarticle, 'export de données');
+		//if (function_exists("dump")) dump($selectarticle, 'export de données');
 		return $selectarticle;
 	}
 
+    /**
+	* Move item
+	*/
     private function _moveItems ($listContents, $datemode, $fielddateid) {
         $movecat = $this->params->get('movecat','');//0 not move article or 1 for move
         $target_cat = $this->params->get('target_category', '');//id of target move categorie
@@ -99,7 +106,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         if ($cleardate == 1 && $datemode == 0){ //clear joomla unpublished date
                 $changeDate="a.publish_down = '0000-00-00 00:00:00'";
             }elseif ($cleardate == 1 && $datemode == 1){ //clear flexicontent date field
-                $changeDate="value ='0000-00-00 00:00:00'";//TODO 
+                $changeDate="value ='0000-00-00 00:00:00'"; 
             }else{
                 $changeDate="";
          }
@@ -125,7 +132,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
             $changeCat="a.catid =$target_cat";
         }elseif ($movecat == 1 && $movesubcat == 1){
             $changeCat="a.catid =$target_cat ".
-                        "LEFT JOIN ";//FLEXIContent subcat
+                        "LEFT JOIN ";//TODO adding FLEXIContent subcat
         }else {
             $changeCat="";
         }
