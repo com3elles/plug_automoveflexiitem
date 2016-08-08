@@ -24,7 +24,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
    }
         
     private function _getDateAction () {
-        $delay = $this->params->get('actiondelay', '');//add delay to sql for get item
+        $delay = $this->params->get('actiondelay', ''); // add delay to sql for get item
         $serveurdateinit = date('Y-m-d H:i:s');
         if ($delay !=0){
         $serveurdate = 'ADDDATE("'.$serveurdateinit.'", INTERVAL '.$delay.')';
@@ -36,36 +36,58 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         return $serveurdate;
     }
    
-   private function _getItemsToMove ($serveurdate, $datemode, $fielddateid) {
-       $methode = $this->params->get('catmethode', '1');// 1 include or 0 exclude categories
-       $moved_cat = $this->params->get('moved_category', '');//categories to get item
-       $limit = 'LIMIT '.$this->params->get('limit', '20').'';//number of item to get
+   /**
+    * Récupération des items à déplacer
+    */
+	private function _getItemsToMove ($serveurdate, $datemode, $fielddateid) {
+		$methode = $this->params->get('catmethode', '1');       // 1 include or 0 exclude categories
+		$moved_cat = $this->params->get('moved_category', '');  // categories to get item
+		$limit = 'LIMIT '.$this->params->get('limit', '20').''; // number of item to get
 
-        $categoriesID = implode(',', $moved_cat);
-        if (function_exists('dump')) dump($categoriesID, 'catid');
-        if ($methode == 0){
-                $whereCateg = 'catid IN ('.$categoriesID.')';
-            }else{
-                $whereCateg = 'catid NOT IN ('.$categoriesID.')';
-            }
-        if (function_exists('dump')) dump($whereCateg, 'catid');
-        if ($datemode ==0){
-                $datsource = 'a.id, a.title, a.publish_down, a.catid FROM #__content AS a WHERE a.publish_down';
-            }else{
-                $datsource = 'a.id, a.title, a.publish_down, b.field_id, b.value , a.catid FROM #__content AS a ' .
-                            'LEFT JOIN #__flexicontent_fields_item_relations AS b ON a.id = b.item_id ' .
-                            'WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
-            }
-            $db = JFactory::getDBO();
-            $query = "SELECT  $datsource > $serveurdate AND $whereCateg $limit";
-            $db->setQuery($query);
-            if (function_exists('dump')) dump($query, 'requete');
-            //if (function_exists('dump')) dump($query->__toString(), 'requete toString');
-            $selectarticle = $db->loadObjectList();
-            if (function_exists('dump')) dump($selectarticle, 'export de données');
-            return $selectarticle;
-    }
-    
+//TODO il faudra refaire l'objet query en utilisant les methodes d'abstraction SQL ... on en parle dans la semaine
+		// selection des champs
+		$datsource = 'a.id, a.title, a.publish_down, a.catid FROM #__content AS a';
+//TODO tu es sur que la liste des champs du SELECT change selon le datmode ??? pas facile a maintenir ca !
+		if ($datemode != 0) {
+			$datsource = 'a.id, a.title, a.publish_down, b.field_id, b.value, a.catid FROM #__content AS a ' .
+						'LEFT JOIN #__flexicontent_fields_item_relations AS b ON b.item_id = a.id';
+//TODO move down (l.69-70)			'WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
+			}
+
+        // construction des clauses WHERE
+		$tWheres = array();
+
+        // clause sur la date de publication
+		if ($datemode == 0)
+			$tWheres[] = "a.publish_down > '$serveurdate'";
+		 
+		// clause sur les categories
+		$categoriesID = implode(',', $moved_cat);
+		if (function_exists("dump")) dump($categoriesID, 'catid');
+		if ($methode == 0) {
+			$tWheres[] = "a.catid IN (".$categoriesID.")";
+		} else {
+			$tWheres[] = "a.catid NOT IN (".$categoriesID.")";
+		}
+		if (function_exists("dump")) dump($whereCateg, "catid");
+
+		// clause sur l'id du champ date (??? c ca ?)
+		if ($fielddateid) 
+			$tWheres[] = "b.field_id = ".$fielddateid;
+
+		$db = JFactory::getDBO();
+		// construction de la requete SQL
+//FIXME $datsource > $serveurdate ??? c dangeureux comme codage, et d'ailleurs ca plantait dans un des cas		$query = "SELECT  $datsource > $serveurdate AND $whereCateg $limit";
+		$sWheres = implode(" AND ", $tWheres);
+		$query = "SELECT $datsource WHERE $sWheres $limit";
+		$db->setQuery($query);
+		if (function_exists("dump")) dump($query, 'requete');
+		//if (function_exists("dump")) dump($query->__toString(), 'requete toString');
+		$selectarticle = $db->loadObjectList();
+		if (function_exists("dump")) dump($selectarticle, 'export de données');
+		return $selectarticle;
+	}
+
     private function _moveItems ($listContents, $datemode, $fielddateid) {
         $movecat = $this->params->get('movecat','');//0 not move article or 1 for move
         $target_cat = $this->params->get('target_category', '');//id of target move categorie
