@@ -69,7 +69,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
 		} else {
 			$tWheres[] = "a.catid NOT IN (".$categoriesID.")";
 		}
-		if (function_exists("dump")) dump($whereCateg, "catid");
+		//if (function_exists("dump")) dump($whereCateg, "catid");
 
 		// clause sur l'id du champ date (??? c ca ?)
 		if ($fielddateid) 
