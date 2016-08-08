@@ -36,9 +36,9 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         return $serveurdate;
     }
    
-   /**
-    * Récupération des items à déplacer
-    */
+	/**
+	* Récupération des items à déplacer
+	*/
 	private function _getItemsToMove ($serveurdate, $datemode, $fielddateid) {
 		$methode = $this->params->get('catmethode', '1');       // 1 include or 0 exclude categories
 		$moved_cat = $this->params->get('moved_category', '');  // categories to get item
@@ -51,13 +51,13 @@ class PlgSystemAutomoveflexiitem extends JPlugin
 		if ($datemode != 0) {
 			$datsource = 'a.id, a.title, a.publish_down, b.field_id, b.value, a.catid FROM #__content AS a ' .
 						'LEFT JOIN #__flexicontent_fields_item_relations AS b ON b.item_id = a.id';
-//TODO move down (l.69-70)			'WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
+//TODO move down (l.75-76)			'WHERE b.field_id = '.$fielddateid.''; //TODO => que faire quand il n'y a pas de champ date associé ??
 			}
 
-        // construction des clauses WHERE
+		// construction des clauses WHERE
 		$tWheres = array();
 
-        // clause sur la date de publication
+		// clause sur la date de publication
 		if ($datemode == 0)
 			$tWheres[] = "a.publish_down > '$serveurdate'";
 		 
