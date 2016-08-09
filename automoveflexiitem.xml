@@ -58,7 +58,7 @@
                 
                 <field name="target_category" type="category" extension="com_content" label="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_TARGETCATEGORY_DESC" showon="movecat:1"/>
                 
-                <field name="movesubcat" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_MOVESUBCAT_LABEL" description="PLG_AUTOMOVEFLEXIITEM_MOVESUBCAT_DESC" class="btn-group btn-group-yesno">
+                <field name="movesubcat" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_MOVESUBCAT_LABEL" description="PLG_AUTOMOVEFLEXIITEM_MOVESUBCAT_DESC" class="btn-group btn-group-yesno" showon="movecat:1">
                 <option value="0">PLG_AUTOMOVEFLEXIITEM_NO</option>
                 <option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
                 </field>
