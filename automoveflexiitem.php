@@ -14,13 +14,36 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $datemode = $this->params->get('datemode','');//0 joomla unplishing date or 1 for flexicontent date
         $fielddateid = $this->params->get('fielddateid','');//id of flexicontent date field
         
+        // init le log file
+            $rotatDate = JFactory::getDate()->format('Y-m');
+            $logLevel = JLog::ALL ^ JLog::WARNING ^ JLog::DEBUG;
+            Jlog::addLogger (
+                array(
+                    'text_file' => 'automove_'.$rotatDate.'.log.php',
+                 ),
+                $logLevel
+            );
+
+        
         $srvdate = $this->_getDateAction();
+        
+         // ecrit dans le journal de log la 1ere trace
+            $logEntry = new JlogEntry("Nouveau traitement autoMove a la date du ".$srvdate, JLog::NOTICE, "automove");
+            Jlog::add($logEntry);
 
         $listContents = $this->_getItemsToMove ($srvdate, $datemode, $fielddateid);
+        
+         // ecrit dans le journal de log le nbr de contenu to move
+            $logEntry = new JlogEntry(count($listContents)." contenus a deplacer", JLog::NOTICE, "automove");
+            Jlog::add($logEntry);
+        
         if (function_exists('dump')) dump($listContents, 'Des données sont à archivées');
         if($listContents)
             $this->_moveItems($listContents, $datemode, $fielddateid);
-        
+         
+        // ecrit dans le journal de log la derniere trace
+            $logEntry = new JlogEntry("fin traitement autoMove a la date du ".$srvdate, JLog::NOTICE, "automove");
+            Jlog::add($logEntry);
    }
     /**
 	* Get date and delay
@@ -102,51 +125,79 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $state = $this->params->get('changestate', '');//changing state of article
         $cleardate = $this->params->get('cleardate', '');//clear date nothing, 0 unpblished, 1 published, -1 archived, -2 trashed
         
+       
+        // construction des clauses WHERE
+		$tWheres = array();
+
+		// clause clear date
         if ($cleardate == 1 && $datemode == 0){ //clear joomla unpublished date
-                $changeDate="a.publish_down = '0000-00-00 00:00:00'";
-            }elseif ($cleardate == 1 && $datemode == 1){ //clear flexicontent date field
-                $changeDate="value ='0000-00-00 00:00:00'"; 
-            }else{
-                $changeDate="";
+                $tWheres[]="publish_down = '0000-00-00 00:00:00'";
          }
         
         switch ($state){//changing state
             case '0': 
-                $changeState="a.state =0";
+                $tWheres[]="state ='0'";
             break;
                 case '1': 
-                $changeState="a.state =1";
+                $tWheres[]="state ='1'";
             break;
             case '-1': 
-                $changeState="a.state =-1";
+                $tWheres[]="state ='-1'";
             break;
             case '-2': 
-                $changeState="a.state =-2";
+                $tWheres[]="state ='-2'";
             break;
-            case 'nothing':
-                $changeState=" ";
-            break;
+           // TODO case 'nothing': soucis dans le WHERE si rien
+            //    $tWheres[]="";
+            //break;
         }
         if ($movecat == 1 && $movesubcat == 0){//move article
-            $changeCat="a.catid =$target_cat";
+            $tWheres[]="catid ='$target_cat'";
         }elseif ($movecat == 1 && $movesubcat == 1){
-            $changeCat="a.catid =$target_cat ".
+            $tWheres[]="catid =$target_cat ".
                         "LEFT JOIN ";//TODO adding FLEXIContent subcat
         }else {
-            $changeCat="";
+            $tWheres[]="";//TODO test si on deplace pas les cats
         }
         
+        $sWheres = implode(" , ", $tWheres);
+        
       foreach ($listContents as $article){
-          $db = JFactory::getDBO();
-          $query = "UPDATE #__content SET $changeDate $changeState $changeCat WHERE id =$article->id";
-          // $db->setQuery($query);
+          
+        //CLEAN MULTI-CAT
+        if ($movecat == 1 ){
+          $db1 = JFactory::getDBO();
+          $query1 = "DELETE FROM #__flexicontent_cats_item_relations  WHERE itemid='$article->id' ";
+          $db1->setQuery($query1);
+          $result1 = $db1->execute();
+               
+          $db2 = JFactory::getDBO();
+          $query2 = "INSERT INTO #__flexicontent_cats_item_relations VALUES ($target_cat , $article->id , 0)";
+          $db2->setQuery($query2);
+          $result2 = $db2->execute();
+         }
+          
+        //UPDATE com_content
+          $db3 = JFactory::getDBO();
+          $query3 = "UPDATE #__content SET $sWheres WHERE id ='$article->id' ";
+          $db3->setQuery($query3);
+          $result3 = $db3->execute();  
+          
+         //UPDATE flexicontent tmp
+          $db4 = JFactory::getDBO();
+          $query4 = "UPDATE #__flexicontent_items_tmp SET $sWheres WHERE id ='$article->id' ";
+          $db4->setQuery($query4);
+          $result4 = $db4->execute();
+          
+          //UPDATE date field
           if ($cleardate == 1 && $datemode == 1){//clear flexicontent date field
-                $querydateflexi = "UPDATE #__flexicontent_fields_item_relations SET $changeDate  WHERE field_id= $fielddateid AND id =$article->id";
-              if (function_exists('dump')) dump($querydateflexi, 'requette update date flexi');
-              // $db->setQuery($querydateflexi);
+            $db5 = JFactory::getDBO();
+            $querydateflexi = "UPDATE #__flexicontent_fields_item_relations SET value=''  WHERE field_id= $fielddateid AND item_id =$article->id";
+             if (function_exists('dump')) dump($querydateflexi, 'requette update date flexi');
+            $db5->setQuery($querydateflexi);
+            $result5 = $db5->execute();
           }
-          if (function_exists('dump')) dump($query, 'requette update');
-          //$result = $db->execute();  
+          
         }
     }
 }
