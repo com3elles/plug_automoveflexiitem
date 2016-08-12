@@ -49,10 +49,15 @@ class PlgSystemAutomoveflexiitem extends JPlugin
 	* Get date and delay
 	*/
     private function _getDateAction () {
-        $delay = $this->params->get('actiondelay', ''); // add delay to sql for get item
-        $serveurdateinit = date('Y-m-d H:i:s');
-        if ($delay !=0){
-        $serveurdate = ' ADDDATE("'.$serveurdateinit.'", INTERVAL '.$delay.')';
+        $numbdelay = $this->params->get('numdelay', '1');
+        $typedelay = $this->params->get('typedelay', '');
+        $actiondelay = $this->params->get('actiondelay', '');
+        $delay = $numbdelay . $typedelay; // add delay to sql for get item
+        $serveurdateinit = date('Y-m-d');
+        if ($actiondelay !=0){
+        $serveurdate = new DateTime($serveurdateinit);
+        $serveurdate->add(new DateInterval('P'.$delay));  
+        $serveurdate= $serveurdate->format('Y-m-d');
         }else{
         $serveurdate = $serveurdateinit;
             }

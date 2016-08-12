@@ -98,7 +98,24 @@
 				</field>
                 
                 
-                <field name="actiondelay" type="text" default="" label="PLG_AUTOMOVEFLEXIITEM_DELAY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_DELAY_DESC" />
+                <field name="actiondelay" type="radio" default="0" label="PLG_AUTOMOVEFLEXIITEM_DELAY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_DELAY_DESC" class="btn-group btn-group-yesno">
+                    <option value="0">PLG_AUTOMOVEFLEXIITEM_NO</option>
+					<option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
+				</field>
+                
+                <field name="numdelay" type="number" default="0" label="PLG_AUTOMOVEFLEXIITEM_NUMBERDELAY" description="PLG_AUTOMOVEFLEXIITEM_NUMBERDELAY_DESC" min="0" step="1" showon="actiondelay:1"/>
+                
+                <field name="typedelay" type="list"
+					default="day"
+					description="PLG_AUTOMOVEFLEXIITEM_TYPEDELAY_DESC"
+					label="PLG_AUTOMOVEFLEXIITEM_DAY_LABEL"
+                       showon="actiondelay:1"
+				>
+					<option value="D">PLG_AUTOMOVEFLEXIITEM_TYPEDELAY_DAY</option>
+                    <option value="M">PLG_AUTOMOVEFLEXIITEM_TYPEDELAY_MONTH</option>
+					<option value="Y">PLG_AUTOMOVEFLEXIITEM_TYPEDELAY_YEAR</option>
+				</field>
+                
 			</fieldset>
  
 		</fields>
