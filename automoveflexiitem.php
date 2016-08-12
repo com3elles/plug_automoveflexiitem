@@ -52,7 +52,7 @@ class PlgSystemAutomoveflexiitem extends JPlugin
         $delay = $this->params->get('actiondelay', ''); // add delay to sql for get item
         $serveurdateinit = date('Y-m-d H:i:s');
         if ($delay !=0){
-        $serveurdate = 'ADDDATE("'.$serveurdateinit.'", INTERVAL '.$delay.')';
+        $serveurdate = ' ADDDATE("'.$serveurdateinit.'", INTERVAL '.$delay.')';
         }else{
         $serveurdate = $serveurdateinit;
             }
