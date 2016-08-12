@@ -103,12 +103,12 @@
 					<option value="1">PLG_AUTOMOVEFLEXIITEM_YES</option>
 				</field>
                 
-                <field name="numdelay" type="number" default="0" label="PLG_AUTOMOVEFLEXIITEM_NUMBERDELAY" description="PLG_AUTOMOVEFLEXIITEM_NUMBERDELAY_DESC" min="0" step="1" showon="actiondelay:1"/>
+                <field name="numdelay" type="number" default="0" label="PLG_AUTOMOVEFLEXIITEM_NUMBERDELAY_LABEL" description="PLG_AUTOMOVEFLEXIITEM_NUMBERDELAY_DESC" min="0" step="1" showon="actiondelay:1"/>
                 
                 <field name="typedelay" type="list"
 					default="day"
 					description="PLG_AUTOMOVEFLEXIITEM_TYPEDELAY_DESC"
-					label="PLG_AUTOMOVEFLEXIITEM_DAY_LABEL"
+					label="PLG_AUTOMOVEFLEXIITEM_TYPEDELAY_LABEL"
                        showon="actiondelay:1"
 				>
 					<option value="D">PLG_AUTOMOVEFLEXIITEM_TYPEDELAY_DAY</option>
